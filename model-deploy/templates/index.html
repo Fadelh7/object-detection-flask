@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Banana vs Watermelon Detector</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    />
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body {% if result %}class="bg-{{ result.label }}"{% endif %}>
+    <main class="container">
+  <h1 class="main-title">Banana vs Watermelon Detector</h1>
+
+
+
+      <div class="quick-images">
+        <h3>Try Example Images:</h3>
+        <div class="quick-img-grid">
+          <div class="quick-img-card">
+            <form method="POST" class="quick-form">
+              <input type="hidden" name="image_url" value="/images/bb.jpeg" />
+              <button type="submit" class="quick-btn">Banana ?</button>
+            </form>
+            <img src="/model-deploy/images/bb.jpeg" alt="Banana Example" class="quick-img" />
+          </div>
+          <div class="quick-img-card">
+            <form method="POST" class="quick-form">
+              <input type="hidden" name="image_url" value="/images/wm.jpeg" />
+              <button type="submit" class="quick-btn">Watermelon?</button>
+            </form>
+            <img src="/model-deploy/images/wm.jpeg" alt="Watermelon Example" class="quick-img" />
+          </div>
+        </div>
+      </div>
+
+      <form method="POST" enctype="multipart/form-data" class="card form-flex">
+        <button type="button" class="refresh-btn" onclick="window.location.href='/'">Start Fresh</button>
+        <div class="form-section">
+          <label for="image" class="file-label">Upload Image</label>
+          <input type="file" name="image" id="image" accept="image/*" />
+        </div>
+        <div class="form-section">
+          <label for="image_url" class="url-label">Or Enter Image URL</label>
+          <input type="url" name="image_url" id="image_url" placeholder="Paste image URL here..." />
+        </div>
+        <button type="submit" class="predict-btn">Detect</button>
+      </form>
+      <div class="icon-bg">
+        <!-- Banana SVGs -->
+        <svg class="bg-icon banana" style="top:10%;left:5%;" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="32" cy="32" rx="28" ry="12" class="banana-ellipse" />
+          <path d="M16 32c0 8 8 16 16 16s16-8 16-16" class="banana-path" stroke-width="4" fill="none" />
+        </svg>
+        <svg class="bg-icon banana" style="top:60%;left:15%;transform:rotate(20deg);" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="32" cy="32" rx="28" ry="12" class="banana-ellipse" />
+          <path d="M16 32c0 8 8 16 16 16s16-8 16-16" class="banana-path" stroke-width="4" fill="none" />
+        </svg>
+        <!-- Watermelon SVGs -->
+        <svg class="bg-icon watermelon" style="bottom:10%;right:5%;" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="32" cy="32" rx="28" ry="12" class="watermelon-ellipse" />
+          <path d="M16 32c0 8 8 16 16 16s16-8 16-16" class="watermelon-path" stroke-width="4" fill="none" />
+          <circle cx="32" cy="32" r="6" class="watermelon-seed" />
+        </svg>
+        <svg class="bg-icon watermelon" style="bottom:60%;right:15%;transform:rotate(-15deg);" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="32" cy="32" rx="28" ry="12" class="watermelon-ellipse" />
+          <path d="M16 32c0 8 8 16 16 16s16-8 16-16" class="watermelon-path" stroke-width="4" fill="none" />
+          <circle cx="32" cy="32" r="6" class="watermelon-seed" />
+        </svg>
+      </div>
+
+      {% if error %}
+      <div class="error">{{ error }}</div>
+      {% endif %}
+
+      {% if result %}
+      <div class="card">
+        <h2>Prediction</h2>
+        <p>
+          Top label:
+          <strong>{{ result.label }}</strong>
+        </p>
+        {% if result.counts %}
+        <p>
+          Counts:
+          {% for k, v in result.counts.items() %}
+          <span class="pill">{{ k }}: {{ v }}</span>
+          {% endfor %}
+        </p>
+        {% endif %}
+        {% if result.annotated_image %}
+        <img
+          src="{{ result.annotated_image }}"
+          alt="Annotated"
+          class="preview"
+        />
+        {% endif %}
+      </div>
+      {% endif %}
+    </main>
+  </body>
+</html>

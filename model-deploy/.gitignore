@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.env
+
+# OS
+.DS_Store
+
+# Models (do not commit large weights)
+models/*.pt
+models/*.onnx
+
+# Uploads/outputs
+uploads/
+static/outputs/
