@@ -102,6 +102,30 @@ def run_inference(
 def create_app() -> Flask:
     ensure_dirs()
     model_path = os.environ.get("YOLO_MODEL_PATH", "models/best.pt")
+    # If YOLO_MODEL_PATH is a URL, download it into models/ so the loader can use a local file.
+    def _ensure_local_model(path_or_url: str) -> str:
+        if not path_or_url:
+            return path_or_url
+        if path_or_url.startswith("http://") or path_or_url.startswith("https://"):
+            # Download to models/<basename>
+            import urllib.request
+            from urllib.parse import urlparse
+
+            parsed = urlparse(path_or_url)
+            fname = os.path.basename(parsed.path) or "best.pt"
+            dest = os.path.join("models", fname)
+            if not os.path.exists(dest):
+                print(f"Downloading model from {path_or_url} to {dest}...")
+                try:
+                    urllib.request.urlretrieve(path_or_url, dest)
+                except Exception as e:
+                    raise RuntimeError(f"Failed to download model from {path_or_url}: {e}")
+            else:
+                print(f"Model already exists at {dest}, skipping download.")
+            return dest
+        return path_or_url
+
+    model_path = _ensure_local_model(model_path)
     conf = float(os.environ.get("CONF_THRES", "0.25"))
 
     app = Flask(__name__)
