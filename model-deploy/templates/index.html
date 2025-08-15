@@ -3,101 +3,200 @@
   <head>
     <meta charset="utf-8" />
     <title>Banana vs Watermelon Detector</title>
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Cheerful kids font -->
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/styles.css" />
   </head>
   <body {% if result %}class="bg-{{ result.label }}"{% endif %}>
-    <main class="container">
-  <h1 class="main-title">Banana vs Watermelon Detector</h1>
+    <div class="scene">
+      <!-- Decorative floating SVGs (scattered) -->
+      <div class="deco-layer" aria-hidden="true">
+        <!-- helper: change inline --x --y --r --s values to vary placements -->
+        <svg class="bg-deco banana" style="--x:5%;--y:8%;--r:-15deg;--s:1.0;" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path class="banana-fill" d="M12 34c2-12 18-24 40-12-4 6-8 12-16 16-12 6-24 4-24-4z"/>
+          <path class="banana-tip" d="M50 18c3 2 6 6 4 10-2 5-8 7-12 6 4-6 6-14 8-16z"/>
+        </svg>
+        <svg class="bg-deco watermelon" style="--x:85%;--y:10%;--r:8deg;--s:0.9;" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle class="watermelon-rind" cx="32" cy="32" r="22"/>
+          <circle class="watermelon-flesh" cx="32" cy="32" r="18"/>
+          <g class="watermelon-seeds">
+            <path class="watermelon-seed" d="M28 26c-.6-.8-1.8-.6-2 .4-.2 1 .8 2 1.6 1.8.8-.2 1.2-1.4.4-2.2z"/>
+            <path class="watermelon-seed" d="M38 30c-.6-.8-1.8-.6-2 .4-.2 1 .8 2 1.6 1.8.8-.2 1.2-1.4.4-2.2z"/>
+          </g>
+        </svg>
+        <svg class="bg-deco banana" style="--x:20%;--y:70%;--r:30deg;--s:1.1;" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path class="banana-fill" d="M10 30c6-10 28-20 42-6-6 8-12 14-22 16C18 44 12 36 10 30z"/>
+          <path class="banana-tip" d="M48 22c2 2 4 5 2 8-2 4-6 5-9 4 3-5 5-11 7-12z"/>
+        </svg>
+        <svg class="bg-deco watermelon" style="--x:75%;--y:78%;--r:-25deg;--s:1.2;" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle class="watermelon-rind" cx="32" cy="32" r="22"/>
+          <circle class="watermelon-flesh" cx="32" cy="32" r="18"/>
+          <g class="watermelon-seeds">
+            <path class="watermelon-seed" d="M30 24c-.6-.8-1.8-.6-2 .4-.2 1 .8 2 1.6 1.8.8-.2 1.2-1.4.4-2.2z"/>
+            <path class="watermelon-seed" d="M36 34c-.6-.8-1.8-.6-2 .4-.2 1 .8 2 1.6 1.8.8-.2 1.2-1.4.4-2.2z"/>
+          </g>
+        </svg>
+        <svg class="bg-deco banana" style="--x:50%;--y:4%;--r:5deg;--s:0.8;" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path class="banana-fill" d="M14 36c8-12 20-18 36-12-6 10-12 16-22 18C20 44 14 40 14 36z"/>
+          <path class="banana-tip" d="M46 20c3 1 5 4 3 7-2 4-7 5-10 4 3-5 4-10 7-11z"/>
+        </svg>
+        <svg class="bg-deco watermelon" style="--x:40%;--y:86%;--r:12deg;--s:1.05;" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle class="watermelon-rind" cx="32" cy="32" r="22"/>
+          <circle class="watermelon-flesh" cx="32" cy="32" r="18"/>
+          <g class="watermelon-seeds">
+            <path class="watermelon-seed" d="M26 30c-.6-.8-1.8-.6-2 .4-.2 1 .8 2 1.6 1.8.8-.2 1.2-1.4.4-2.2z"/>
+            <path class="watermelon-seed" d="M36 28c-.6-.8-1.8-.6-2 .4-.2 1 .8 2 1.6 1.8.8-.2 1.2-1.4.4-2.2z"/>
+          </g>
+        </svg>
+        <!-- more copies for density -->
+        <svg class="bg-deco banana" style="--x:8%;--y:42%;--r:50deg;--s:0.95;" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path class="banana-fill" d="M10 34c6-10 28-20 42-6-6 8-12 14-22 16C18 44 12 36 10 34z"/>
+          <path class="banana-tip" d="M46 24c2 1 4 3 2 6-2 3-6 4-9 3 3-4 5-7 7-9z"/>
+        </svg>
+        <svg class="bg-deco watermelon" style="--x:90%;--y:48%;--r:-40deg;--s:0.9;" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle class="watermelon-rind" cx="32" cy="32" r="22"/>
+          <circle class="watermelon-flesh" cx="32" cy="32" r="18"/>
+          <g class="watermelon-seeds">
+            <path class="watermelon-seed" d="M30 26c-.6-.8-1.8-.6-2 .4-.2 1 .8 2 1.6 1.8.8-.2 1.2-1.4.4-2.2z"/>
+          </g>
+        </svg>
+        <svg class="bg-deco banana" style="--x:30%;--y:20%;--r:-8deg;--s:1.15;" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path class="banana-fill" d="M12 34c2-12 18-24 40-12-4 6-8 12-16 16-12 6-24 4-24-4z"/>
+          <path class="banana-tip" d="M50 16c3 2 5 5 3 8-2 4-7 5-10 4 3-5 5-9 7-12z"/>
+        </svg>
+        <svg class="bg-deco watermelon" style="--x:60%;--y:28%;--r:22deg;--s:1.0;" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle class="watermelon-rind" cx="32" cy="32" r="22"/>
+          <circle class="watermelon-flesh" cx="32" cy="32" r="18"/>
+          <g class="watermelon-seeds">
+            <path class="watermelon-seed" d="M28 28c-.6-.8-1.8-.6-2 .4-.2 1 .8 2 1.6 1.8.8-.2 1.2-1.4.4-2.2z"/>
+            <path class="watermelon-seed" d="M36 30c-.6-.8-1.8-.6-2 .4-.2 1 .8 2 1.6 1.8.8-.2 1.2-1.4.4-2.2z"/>
+          </g>
+        </svg>
+        <svg class="bg-deco banana" style="--x:68%;--y:60%;--r:5deg;--s:1.05;" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path class="banana-fill" d="M14 36c8-12 20-18 36-12-6 10-12 16-22 18C20 44 14 40 14 36z"/>
+          <path class="banana-tip" d="M48 22c3 1 5 3 3 6-2 3-6 4-9 3 3-4 5-7 7-9z"/>
+        </svg>
+        <svg class="bg-deco watermelon" style="--x:12%;--y:62%;--r:-35deg;--s:0.9;" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle class="watermelon-rind" cx="32" cy="32" r="22"/>
+          <circle class="watermelon-flesh" cx="32" cy="32" r="18"/>
+          <g class="watermelon-seeds">
+            <path class="watermelon-seed" d="M32 24c-.6-.8-1.8-.6-2 .4-.2 1 .8 2 1.6 1.8.8-.2 1.2-1.4.4-2.2z"/>
+          </g>
+        </svg>
+      </div>
 
+      <main class="wrap">
+        <header class="hero">
+          <h1 class="title">Banana vs Watermelon Detector</h1>
+          <p class="subtitle">Pick a picture, press Detect, and see what we find — it's like magic! 🍌🍉</p>
+        </header>
 
+        <!-- Example Cards -->
+        <section class="examples">
+          <h2 class="section-title">Try a sample</h2>
+          <div class="cards">
+            <article class="card example">
+              <img src="/images/bb.jpeg" alt="Banana example" class="ex-img" />
+              <form method="POST" class="quick-form">
+                <input type="hidden" name="image_url" value="/images/bb.jpeg" />
+                <button type="submit" class="action btn-try">Try Banana</button>
+              </form>
+            </article>
 
-      <div class="quick-images">
-        <h3>Try Example Images:</h3>
-        <div class="quick-img-grid">
-          <div class="quick-img-card">
-            <form method="POST" class="quick-form">
-              <input type="hidden" name="image_url" value="/images/bb.jpeg" />
-              <button type="submit" class="quick-btn">Banana ?</button>
-            </form>
-            <img src="/model-deploy/images/bb.jpeg" alt="Banana Example" class="quick-img" />
+            <article class="card example">
+              <img src="/images/wm.jpeg" alt="Watermelon example" class="ex-img" />
+              <form method="POST" class="quick-form">
+                <input type="hidden" name="image_url" value="/images/wm.jpeg" />
+                <button type="submit" class="action btn-try">Try Watermelon</button>
+              </form>
+            </article>
           </div>
-          <div class="quick-img-card">
-            <form method="POST" class="quick-form">
-              <input type="hidden" name="image_url" value="/images/wm.jpeg" />
-              <button type="submit" class="quick-btn">Watermelon?</button>
-            </form>
-            <img src="/model-deploy/images/wm.jpeg" alt="Watermelon Example" class="quick-img" />
+        </section>
+
+        <!-- Upload / URL form -->
+        <section class="uploader card">
+          <form method="POST" enctype="multipart/form-data" class="upload-form">
+            <div class="top-row">
+              <button type="button" class="refresh-btn" onclick="window.location.href='/'" title="Start fresh">Start Fresh</button>
+              <button type="submit" class="detect-btn">Detect</button>
+            </div>
+
+            <div class="field file-field">
+              <label for="image" class="field-label">Take a photo or pick one</label>
+              <div class="input-wrap">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h3l2-3h6l2 3h3v12H4z" /></svg>
+                <input type="file" name="image" id="image" accept="image/*" class="file-input" />
+              </div>
+            </div>
+
+            <div class="field url-field">
+              <label for="image_url" class="field-label">Or paste an image link</label>
+              <div class="input-wrap">
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.9 12a4.2 4.2 0 015.94-0.02l1.27 1.27 1.42-1.42-1.27-1.27A6.6 6.6 0 102.5 12z" /></svg>
+                <input type="url" name="image_url" id="image_url" placeholder="https://example.com/pic.jpg" class="text-input" />
+              </div>
+            </div>
+
+            <!-- keep Jinja hidden inputs or other hidden fields untouched if you have them elsewhere -->
+          </form>
+        </section>
+
+        <!-- Errors -->
+        {% if error %}
+        <div class="notice error">{{ error }}</div>
+        {% endif %}
+
+        <!-- Results -->
+        {% if result %}
+        <section class="result card">
+          <h2 class="result-title">Prediction</h2>
+          <p class="result-line">Top label: <strong>{{ result.label }}</strong></p>
+
+          {% if result.counts %}
+          <p class="result-line">Counts:
+            {% for k, v in result.counts.items() %}
+            <span class="pill">{{ k }}: {{ v }}</span>
+            {% endfor %}
+          </p>
+          {% endif %}
+
+          {% if result.annotated_image %}
+          <div class="preview-wrap">
+            <img src="{{ result.annotated_image }}" alt="Annotated result" class="preview" />
           </div>
-        </div>
-      </div>
-
-      <form method="POST" enctype="multipart/form-data" class="card form-flex">
-        <button type="button" class="refresh-btn" onclick="window.location.href='/'">Start Fresh</button>
-        <div class="form-section">
-          <label for="image" class="file-label">Upload Image</label>
-          <input type="file" name="image" id="image" accept="image/*" />
-        </div>
-        <div class="form-section">
-          <label for="image_url" class="url-label">Or Enter Image URL</label>
-          <input type="url" name="image_url" id="image_url" placeholder="Paste image URL here..." />
-        </div>
-        <button type="submit" class="predict-btn">Detect</button>
-      </form>
-      <div class="icon-bg">
-        <!-- Banana SVGs -->
-        <svg class="bg-icon banana" style="top:10%;left:5%;" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="32" cy="32" rx="28" ry="12" class="banana-ellipse" />
-          <path d="M16 32c0 8 8 16 16 16s16-8 16-16" class="banana-path" stroke-width="4" fill="none" />
-        </svg>
-        <svg class="bg-icon banana" style="top:60%;left:15%;transform:rotate(20deg);" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="32" cy="32" rx="28" ry="12" class="banana-ellipse" />
-          <path d="M16 32c0 8 8 16 16 16s16-8 16-16" class="banana-path" stroke-width="4" fill="none" />
-        </svg>
-        <!-- Watermelon SVGs -->
-        <svg class="bg-icon watermelon" style="bottom:10%;right:5%;" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="32" cy="32" rx="28" ry="12" class="watermelon-ellipse" />
-          <path d="M16 32c0 8 8 16 16 16s16-8 16-16" class="watermelon-path" stroke-width="4" fill="none" />
-          <circle cx="32" cy="32" r="6" class="watermelon-seed" />
-        </svg>
-        <svg class="bg-icon watermelon" style="bottom:60%;right:15%;transform:rotate(-15deg);" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <ellipse cx="32" cy="32" rx="28" ry="12" class="watermelon-ellipse" />
-          <path d="M16 32c0 8 8 16 16 16s16-8 16-16" class="watermelon-path" stroke-width="4" fill="none" />
-          <circle cx="32" cy="32" r="6" class="watermelon-seed" />
-        </svg>
-      </div>
-
-      {% if error %}
-      <div class="error">{{ error }}</div>
-      {% endif %}
-
-      {% if result %}
-      <div class="card">
-        <h2>Prediction</h2>
-        <p>
-          Top label:
-          <strong>{{ result.label }}</strong>
-        </p>
-        {% if result.counts %}
-        <p>
-          Counts:
-          {% for k, v in result.counts.items() %}
-          <span class="pill">{{ k }}: {{ v }}</span>
-          {% endfor %}
-        </p>
+          {% endif %}
+        </section>
         {% endif %}
-        {% if result.annotated_image %}
-        <img
-          src="{{ result.annotated_image }}"
-          alt="Annotated"
-          class="preview"
-        />
-        {% endif %}
-      </div>
-      {% endif %}
-    </main>
+      </main>
+    </div>
+
+    <!-- small inline script to add 'has-result' for subtle page changes (optional) -->
+    <script>
+      (function(){
+        // keep minimal — we don't change backend flow; only gracefully support CSS transitions
+        const body = document.body;
+        if (body.className && body.className.trim().length) {
+          document.documentElement.classList.add('has-result');
+        }
+      })();
+    </script>
+    <script>
+      // Debug helper: log example image srcs and try fetching them
+      (function(){
+        try{
+          const imgs = document.querySelectorAll('.example .ex-img');
+          imgs.forEach(img => {
+            console.log('[DEBUG] example img src ->', img.src, 'alt->', img.alt);
+            // attempt a fetch to reveal server errors (same-origin)
+            fetch(img.src, { method: 'GET', cache: 'no-store' })
+              .then(resp => console.log('[DEBUG] fetch', img.src, 'status', resp.status))
+              .catch(err => console.warn('[DEBUG] fetch error for', img.src, err));
+            // also listen for onerror
+            img.onerror = function(e){ console.warn('[DEBUG] img onerror', img.src, e); };
+          });
+        }catch(e){ console.error('[DEBUG] images debug failed', e); }
+      })();
+    </script>
   </body>
 </html>
