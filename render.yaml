@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: object-detection-flask
+    env: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: ./
+    plan: free
+    region: oregon
+    branch: main
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: FLASK_ENV
+        value: production
+      - key: YOLO_MODEL_PATH
+        value: models/best.pt
+      - key: CONF_THRES
+        value: "0.25"
+    buildCommand: ""
+    startCommand: ""
+    autoDeploy: true
