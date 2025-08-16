@@ -102,6 +102,7 @@ def run_inference(
 def create_app() -> Flask:
     ensure_dirs()
     model_path = os.environ.get("YOLO_MODEL_PATH", "models/best.pt")
+    
     # If YOLO_MODEL_PATH is a URL, download it into models/ so the loader can use a local file.
     def _ensure_local_model(path_or_url: str) -> str:
         if not path_or_url:
@@ -125,7 +126,34 @@ def create_app() -> Flask:
             return dest
         return path_or_url
 
+    # If the model file doesn't exist, use YOLO's built-in model download
+    def _get_default_model(path: str) -> str:
+        if os.path.exists(path):
+            return path
+        
+        # If custom model doesn't exist, fall back to YOLOv8n
+        print(f"Model file {path} not found. Using YOLOv8n as fallback...")
+        fallback_path = "models/yolov8n.pt"
+        
+        # YOLOv8n will be downloaded automatically by ultralytics
+        if not os.path.exists(fallback_path):
+            print("Downloading YOLOv8n model...")
+            # This will download the model to the ultralytics cache and return the path
+            temp_model = YOLO('yolov8n.pt')
+            # Copy to our models directory for consistency
+            import shutil
+            cache_path = temp_model.ckpt_path if hasattr(temp_model, 'ckpt_path') else None
+            if cache_path and os.path.exists(cache_path):
+                shutil.copy2(cache_path, fallback_path)
+                print(f"Copied model to {fallback_path}")
+            else:
+                # If we can't copy, just use yolov8n.pt and let ultralytics handle it
+                return 'yolov8n.pt'
+        
+        return fallback_path
+
     model_path = _ensure_local_model(model_path)
+    model_path = _get_default_model(model_path)
     conf = float(os.environ.get("CONF_THRES", "0.25"))
 
     app = Flask(__name__)

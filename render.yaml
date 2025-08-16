@@ -17,6 +17,9 @@ services:
         value: models/best.pt
       - key: CONF_THRES
         value: "0.25"
+      # Uncomment the line below if you have your custom model hosted online
+      # - key: YOLO_MODEL_PATH
+      #   value: https://your-model-hosting-url.com/best.pt
     buildCommand: ""
     startCommand: ""
     autoDeploy: true
