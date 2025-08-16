@@ -29,16 +29,15 @@ def load_model(model_path: str) -> YOLO:
             "Place best.pt in models/ or set YOLO_MODEL_PATH."
         )
     print(f"Loading model from {model_path}...")
+    
+    # Load model with minimal memory usage
+    import os
+    os.environ['PYTORCH_JIT'] = '0'  # Disable JIT compilation to save memory
+    
     model = YOLO(model_path)
     
-    # Warm up the model with a dummy prediction to improve first inference speed
-    try:
-        import numpy as np
-        dummy_image = np.zeros((640, 640, 3), dtype=np.uint8)
-        model.predict(dummy_image, verbose=False, device='cpu')
-        print("Model warmed up successfully")
-    except Exception as e:
-        print(f"Model warmup failed (non-critical): {e}")
+    # Skip warming for memory efficiency on free tier
+    print("Model loaded successfully (skipping warmup for memory efficiency)")
     
     return model
 
@@ -70,30 +69,42 @@ def run_inference(
     conf: float = 0.25,
     save_annotated: bool = True,
 ) -> Dict[str, Any]:
-    # Optimize inference settings for speed
+    # Ultra-lightweight inference settings for memory-constrained environment
     res = model.predict(
         source=image_path, 
         conf=conf, 
         verbose=False,
         device='cpu',  # Explicitly use CPU
         half=False,    # Don't use half precision on CPU
-        imgsz=640,     # Standard image size for good speed/accuracy balance
+        imgsz=320,     # Smaller image size for faster processing and less memory
+        max_det=10,    # Limit detections to save memory
+        agnostic_nms=True,  # Faster NMS
     )[0]
     
     label, counts = top_label_from_results(res, model.names)
 
     annotated_rel = None
     if save_annotated:
-        annotated = res.plot()  # BGR image
-        out_name = f"{uuid.uuid4().hex}_pred.jpg"
-        out_path = os.path.join("static", "outputs", out_name)
+        try:
+            annotated = res.plot()  # BGR image
+            out_name = f"{uuid.uuid4().hex}_pred.jpg"
+            out_path = os.path.join("static", "outputs", out_name)
 
-        # Write using cv2 without importing it globally
-        import cv2
+            # Write using cv2 without importing it globally
+            import cv2
 
-        # Optimize image compression for faster saving
-        cv2.imwrite(out_path, annotated, [cv2.IMWRITE_JPEG_QUALITY, 85])
-        annotated_rel = f"/static/outputs/{out_name}"
+            # Optimize image compression for faster saving and smaller files
+            cv2.imwrite(out_path, annotated, [
+                cv2.IMWRITE_JPEG_QUALITY, 75,  # Lower quality for smaller size
+                cv2.IMWRITE_JPEG_OPTIMIZE, 1   # Optimize encoding
+            ])
+            annotated_rel = f"/static/outputs/{out_name}"
+            
+            # Clean up memory immediately
+            del annotated
+        except Exception as e:
+            print(f"Failed to save annotated image: {e}")
+            annotated_rel = None
 
     # Detections as JSON-friendly objects
     detections: List[Dict[str, Any]] = []
@@ -112,6 +123,9 @@ def run_inference(
                 }
             )
 
+    # Clean up memory
+    del res
+    
     return {
         "label": label,  # "banana" or "watermelon" (or "no_fruit_detected")
         "counts": counts,
@@ -182,9 +196,20 @@ def create_app() -> Flask:
     conf = float(os.environ.get("CONF_THRES", "0.25"))
 
     app = Flask(__name__)
-    app.config["MAX_CONTENT_LENGTH"] = 15 * 1024 * 1024  # 15MB
-    app.model = load_model(model_path)
+    app.config["MAX_CONTENT_LENGTH"] = 8 * 1024 * 1024  # Reduce to 8MB for memory efficiency
+    
+    # Store model path but don't load until first request (lazy loading)
+    app.model_path = model_path
+    app.model = None
     app.conf_thres = conf
+    
+    def get_model():
+        """Lazy load the model on first request"""
+        if app.model is None:
+            print("First request - loading model...")
+            app.model = load_model(app.model_path)
+            print("Model loaded successfully!")
+        return app.model
 
     @app.route('/images/<path:filename>')
     def images(filename):
@@ -255,7 +280,7 @@ def create_app() -> Flask:
                 return render_template("index.html", error="No image provided.")
 
             result = run_inference(
-                model=app.model,
+                model=get_model(),
                 image_path=image_path,
                 conf=app.conf_thres,
                 save_annotated=True,
@@ -283,7 +308,7 @@ def create_app() -> Flask:
         f.save(save_path)
 
         result = run_inference(
-            model=app.model,
+            model=get_model(),
             image_path=save_path,
             conf=app.conf_thres,
             save_annotated=True,

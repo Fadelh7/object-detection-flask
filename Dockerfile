@@ -45,6 +45,6 @@ RUN python -c "import os, urllib.request; \
      print(f'Model cached at {model_path}')) or print('Model already available')"
 
 EXPOSE 8080
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "1", "--timeout", "300", "--worker-class", "sync", "--max-requests", "1000", "--max-requests-jitter", "50", "--preload", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "1", "--timeout", "600", "--worker-class", "sync", "--max-requests", "100", "--max-requests-jitter", "10", "--worker-tmp-dir", "/dev/shm", "--preload", "app:app"]
 
 

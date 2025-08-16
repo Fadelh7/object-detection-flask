@@ -9,6 +9,7 @@ __pycache__/
 
 # Models (do not commit large weights)
 models/*.pt
+!models/best.pt
 models/*.onnx
 
 # Uploads/outputs
