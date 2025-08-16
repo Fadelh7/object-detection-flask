@@ -28,7 +28,18 @@ def load_model(model_path: str) -> YOLO:
             f"Model weights not found at '{model_path}'. "
             "Place best.pt in models/ or set YOLO_MODEL_PATH."
         )
+    print(f"Loading model from {model_path}...")
     model = YOLO(model_path)
+    
+    # Warm up the model with a dummy prediction to improve first inference speed
+    try:
+        import numpy as np
+        dummy_image = np.zeros((640, 640, 3), dtype=np.uint8)
+        model.predict(dummy_image, verbose=False, device='cpu')
+        print("Model warmed up successfully")
+    except Exception as e:
+        print(f"Model warmup failed (non-critical): {e}")
+    
     return model
 
 
@@ -59,7 +70,16 @@ def run_inference(
     conf: float = 0.25,
     save_annotated: bool = True,
 ) -> Dict[str, Any]:
-    res = model.predict(source=image_path, conf=conf, verbose=False)[0]
+    # Optimize inference settings for speed
+    res = model.predict(
+        source=image_path, 
+        conf=conf, 
+        verbose=False,
+        device='cpu',  # Explicitly use CPU
+        half=False,    # Don't use half precision on CPU
+        imgsz=640,     # Standard image size for good speed/accuracy balance
+    )[0]
+    
     label, counts = top_label_from_results(res, model.names)
 
     annotated_rel = None
@@ -71,7 +91,8 @@ def run_inference(
         # Write using cv2 without importing it globally
         import cv2
 
-        cv2.imwrite(out_path, annotated)
+        # Optimize image compression for faster saving
+        cv2.imwrite(out_path, annotated, [cv2.IMWRITE_JPEG_QUALITY, 85])
         annotated_rel = f"/static/outputs/{out_name}"
 
     # Detections as JSON-friendly objects
@@ -135,20 +156,24 @@ def create_app() -> Flask:
         print(f"Model file {path} not found. Using YOLOv8n as fallback...")
         fallback_path = "models/yolov8n.pt"
         
-        # YOLOv8n will be downloaded automatically by ultralytics
-        if not os.path.exists(fallback_path):
-            print("Downloading YOLOv8n model...")
-            # This will download the model to the ultralytics cache and return the path
-            temp_model = YOLO('yolov8n.pt')
-            # Copy to our models directory for consistency
-            import shutil
-            cache_path = temp_model.ckpt_path if hasattr(temp_model, 'ckpt_path') else None
-            if cache_path and os.path.exists(cache_path):
-                shutil.copy2(cache_path, fallback_path)
-                print(f"Copied model to {fallback_path}")
-            else:
-                # If we can't copy, just use yolov8n.pt and let ultralytics handle it
-                return 'yolov8n.pt'
+        # Check if we already have it cached
+        if os.path.exists(fallback_path):
+            print(f"Using cached YOLOv8n model at {fallback_path}")
+            return fallback_path
+        
+        # Download YOLOv8n directly to our models directory to avoid repeated downloads
+        print("Downloading YOLOv8n model...")
+        try:
+            import urllib.request
+            yolo_url = "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8n.pt"
+            print(f"Downloading from {yolo_url}...")
+            urllib.request.urlretrieve(yolo_url, fallback_path)
+            print(f"Downloaded and cached model to {fallback_path}")
+        except Exception as e:
+            print(f"Failed to download model directly: {e}")
+            # Fallback to ultralytics auto-download
+            print("Falling back to ultralytics auto-download...")
+            return 'yolov8n.pt'
         
         return fallback_path
 

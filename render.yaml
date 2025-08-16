@@ -17,6 +17,15 @@ services:
         value: models/best.pt
       - key: CONF_THRES
         value: "0.25"
+      # Performance optimizations
+      - key: YOLO_CONFIG_DIR
+        value: /tmp/Ultralytics
+      - key: PYTORCH_DISABLE_CUDNN
+        value: "1"
+      - key: OMP_NUM_THREADS
+        value: "1"
+      - key: MKL_NUM_THREADS
+        value: "1"
       # Uncomment the line below if you have your custom model hosted online
       # - key: YOLO_MODEL_PATH
       #   value: https://your-model-hosting-url.com/best.pt
