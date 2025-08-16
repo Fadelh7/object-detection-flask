@@ -20,7 +20,7 @@ The model can process any image containing these fruits and provide real-time de
 
 ## 🖼️ App Preview
 
-![Sample Detection](images/wm-bb.jpg)
+![Sample Detection](images/OBFDWB.png)
 *Example: Watermelon detection with bounding boxes and confidence scores*
 
 ## 🛠️ Setup Instructions (Local Docker)
