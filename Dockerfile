@@ -35,16 +35,7 @@ COPY images/ ./images/
 # Ensure runtime dirs exist
 RUN mkdir -p uploads static/outputs
 
-# Pre-download YOLOv8n model to avoid runtime downloads
-RUN python -c "import os, urllib.request; \
-    model_path = 'models/yolov8n.pt'; \
-    print('Checking for model files...'); \
-    (not os.path.exists('models/best.pt') and not os.path.exists(model_path)) and \
-    (print('Pre-downloading YOLOv8n model for faster startup...'), \
-     urllib.request.urlretrieve('https://github.com/ultralytics/assets/releases/download/v8.3.0/yolov8n.pt', model_path), \
-     print(f'Model cached at {model_path}')) or print('Model already available')"
-
 EXPOSE 8080
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "1", "--timeout", "600", "--worker-class", "sync", "--max-requests", "100", "--max-requests-jitter", "10", "--worker-tmp-dir", "/dev/shm", "--preload", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "1", "--timeout", "120", "app:app"]
 
 
